@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reservations</title>
+    <link rel="stylesheet" href="./css/view.css">
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .wrapper {
+            background-color: #333;
+            padding: 10px 0;
+        }
+
+        .nav-bar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-bar ul li {
+            display: inline;
+        }
+
+        .nav-bar ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+
+        .nav-bar ul li a:hover {
+            color: #ffcc00;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: 40px;
+            height: auto;
+        }
+
+        .main-section {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 800px;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        .done {
+            background-color: lightgreen;
+            text-decoration: line-through;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .back-btn {
+            background-color: #333;
+            color: white;
+            display: block;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .delete-btn {
+            background-color: red;
+            color: white;
+        }
+
+        .done-btn {
+            background-color: green;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="nav-bar">
+            <ul>
+                <div class="logo">
+                    <img id="logo-photo" src="./images/utensil.png" alt="utensils">
+                    <h2 class="restaurant-name">Restaurant</h2>
+                </div>
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="aboutus.html">ABOUT</a></li>
+                <li><a href="services.html">SERVICE</a></li>
+                <li><a href="menu.html">MENU</a></li>
+                <li><a href="contact.html">CONTACT</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="main-section">
+        <h2>Your Reservations</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Date</th>
+                    <th>Guests</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="reservationTable"></tbody>
+        </table>
+        <button class="back-btn" onclick="window.location.href='booktable.html'">Back to Booking</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let UserData = JSON.parse(localStorage.getItem('Data')) || [];
+            let tableBody = document.getElementById("reservationTable");
+
+            function renderTable() {
+                tableBody.innerHTML = ""; 
+
+                if (UserData.length === 0) {
+                    tableBody.innerHTML = "<tr><td colspan='7'>No reservations found</td></tr>";
+                } else {
+                    UserData.forEach((user, index) => {
+                        let row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${user.FirstName}</td>
+                            <td>${user.LastName}</td>
+                            <td>${user.EmailAdd}</td>
+                            <td>${user.Phone}</td>
+                            <td>${user.Reservation}</td>
+                            <td>${user.GuesCount}</td>
+                            <td>
+                                <button class="done-btn" onclick="markDone(${index}, this)">Done</button>
+                                <button class="delete-btn" onclick="deleteReservation(${index})">Delete</button>
+                            </td>
+                        `;
+
+                        if (user.completed) {
+                            row.classList.add("done");
+                        }
+
+                        tableBody.appendChild(row);
+                    });
+                }
+            }
+
+            window.markDone = function(index, button) {
+                UserData[index].completed = !UserData[index].completed;
+                localStorage.setItem('Data', JSON.stringify(UserData));
+                renderTable();
+            }
+
+            window.deleteReservation = function(index) {
+                UserData.splice(index, 1);
+                localStorage.setItem('Data', JSON.stringify(UserData));
+                renderTable();
+            }
+
+            renderTable();
+        });
+    </script>
+
+</body>
+</html>
